@@ -15,9 +15,10 @@ const sqlConfig = {
   database: process.env.MSSQL_DATABASE,
   user: process.env.MSSQL_USERNAME,
   password: process.env.MSSQL_PASSWORD,
+  port: parseInt(process.env.MSSQL_PORT || '1433'),
   options: {
-    encrypt: true,
-    trustServerCertificate: false,
+    encrypt: process.env.MSSQL_ENCRYPT === 'true',
+    trustServerCertificate: process.env.MSSQL_TRUST_SERVER_CERTIFICATE === 'true',
     connectTimeout: 30000,
     requestTimeout: 30000,
   },
@@ -48,6 +49,16 @@ app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     service: 'mssql-bridge',
+    connected: pool && pool.connected 
+  });
+});
+
+// Root endpoint for health check
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    service: 'mssql-bridge',
+    message: 'MSSQL Bridge is running',
     connected: pool && pool.connected 
   });
 });
